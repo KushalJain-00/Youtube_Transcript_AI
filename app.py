@@ -5,7 +5,11 @@ from datetime import datetime, timedelta
 from functools import wraps
 import secrets
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(__name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"))
 
 # ─── PRODUCTION CONFIG ────────────────────────────────────────────────────────
 # SECRET_KEY: Must be persistent across restarts or sessions will be invalidated.
@@ -17,7 +21,11 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 
 CORS(app, supports_credentials=True)
 
-DB_PATH = os.environ.get("DB_PATH", "ytai_data.db")
+# On Vercel, filesystem is read-only except /tmp
+if os.environ.get("VERCEL"):
+    DB_PATH = "/tmp/ytai_data.db"
+else:
+    DB_PATH = os.environ.get("DB_PATH", "ytai_data.db")
 
 # ─── DB SETUP ────────────────────────────────────────────────────────────────
 
