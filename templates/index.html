@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YT.AI — YouTube Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06080f;
+  --surface: #0d1117;
+  --surface2: #161b27;
+  --border: #1e2533;
+  --accent: #3b82f6;
+  --accent2: #8b5cf6;
+  --accent3: #06b6d4;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --radius: 12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── AUTH SCREEN ── */
+#auth-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:400px}
+.auth-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px}
+.auth-tagline{text-align:center;color:var(--muted);font-size:13px;margin-bottom:28px}
+.tab-row{display:flex;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:24px}
+.tab-btn{flex:1;padding:8px;border:none;background:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;border-radius:8px;transition:.2s}
+.tab-btn.active{background:var(--accent);color:#fff;font-weight:500}
+.form-group{margin-bottom:14px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+input{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:.2s}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
+.btn{width:100%;padding:11px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:.2s;letter-spacing:.01em}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{border-color:var(--accent)}
+.btn-sm{padding:7px 14px;font-size:13px;width:auto}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px}
+.alert-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+.alert-success{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#6ee7b7}
+
+/* ── MAIN APP ── */
+#main-app{display:none;height:100vh;display:none;flex-direction:column}
+#main-app.visible{display:flex}
+
+/* ── NAVBAR ── */
+nav{display:flex;align-items:center;gap:12px;padding:14px 24px;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.nav-logo{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:8px}
+.nav-tabs{display:flex;gap:2px;flex:1}
+.nav-tab{padding:7px 14px;border:none;background:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;border-radius:8px;transition:.2s;display:flex;align-items:center;gap:6px}
+.nav-tab:hover{background:var(--surface2);color:var(--text)}
+.nav-tab.active{background:var(--surface2);color:var(--accent);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.user-badge{font-size:13px;color:var(--muted);background:var(--surface2);padding:5px 12px;border-radius:20px;border:1px solid var(--border)}
+.btn-icon{background:none;border:none;color:var(--muted);cursor:pointer;padding:7px;border-radius:8px;font-size:18px;transition:.2s;line-height:1}
+.btn-icon:hover{background:var(--surface2);color:var(--text)}
+
+/* ── CONTENT ── */
+.page{display:none;flex:1;overflow-y:auto;padding:28px 24px}
+.page.active{display:block}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.page-sub{color:var(--muted);font-size:13px;margin-bottom:24px}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.card-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:14px}
+.input-row{display:flex;gap:10px;align-items:flex-end}
+.input-row .field{flex:1;margin-bottom:0}
+select{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;cursor:pointer}
+select:focus{border-color:var(--accent)}
+textarea{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',monospace;font-size:12px;outline:none;resize:vertical;min-height:180px;line-height:1.6}
+textarea:focus{border-color:var(--accent)}
+.checkbox-row{display:flex;align-items:center;gap:8px;cursor:pointer}
+.checkbox-row input[type=checkbox]{width:auto;accent-color:var(--accent)}
+.checkbox-row span{font-size:13px;color:var(--muted)}
+.range-row{display:flex;align-items:center;gap:10px}
+input[type=range]{flex:1;accent-color:var(--accent)}
+.range-val{font-size:13px;color:var(--accent);font-weight:500;min-width:30px}
+
+/* ── RESULT ── */
+.result-section{margin-top:20px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.video-meta{display:flex;flex-direction:column;gap:4px;padding:14px;background:var(--surface2);border-radius:10px;margin-bottom:14px}
+.video-meta .title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.video-meta .channel{font-size:13px;color:var(--muted)}
+.video-meta a{font-size:12px;color:var(--accent);text-decoration:none}
+.video-meta a:hover{text-decoration:underline}
+.stat-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.stat{padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--muted)}
+.stat span{color:var(--text);font-weight:500}
+.section-block{background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid var(--accent)}
+.section-block.takeaways{border-left-color:var(--accent2)}
+.section-block.notes{border-left-color:var(--accent3)}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.section-text{font-size:13px;line-height:1.7;color:var(--text)}
+.takeaway-item{display:flex;gap:8px;margin-bottom:7px;font-size:13px}
+.takeaway-num{width:20px;height:20px;border-radius:50%;background:var(--accent2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.note-item{padding:5px 0;font-size:13px;color:var(--text);border-bottom:1px solid var(--border)}
+.note-item:last-child{border:none}
+.note-item::before{content:"·  ";color:var(--accent3);font-size:16px}
+.download-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.dl-btn{display:flex;align-items:center;gap:6px;padding:9px 16px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;text-decoration:none;transition:.2s}
+.dl-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ── CHANNEL RESULTS ── */
+.video-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer;transition:.2s}
+.video-card:hover{border-color:var(--accent)}
+.video-card .vc-title{font-size:13px;font-weight:500;margin-bottom:6px}
+.video-card .vc-meta{font-size:12px;color:var(--muted);display:flex;gap:10px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500}
+.badge-ok{background:rgba(16,185,129,.15);color:var(--success)}
+.badge-no{background:rgba(100,116,139,.1);color:var(--muted)}
+.badge-ai{background:rgba(139,92,246,.15);color:var(--accent2)}
+
+/* ── HISTORY ── */
+.history-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px}
+.history-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.history-icon.video{background:rgba(59,130,246,.15)}
+.history-icon.channel{background:rgba(139,92,246,.15)}
+.history-info{flex:1;min-width:0}
+.history-info .ht{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.history-info .hd{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── SETTINGS ── */
+.key-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px}
+.key-provider{font-size:13px;font-weight:600;width:90px}
+.key-masked{font-family:monospace;font-size:12px;color:var(--muted);flex:1}
+.key-date{font-size:11px;color:var(--muted);margin-right:4px}
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.provider-card{padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;text-align:center;transition:.2s;font-size:12px;color:var(--muted)}
+.provider-card:hover,.provider-card.selected{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.07)}
+.provider-card .pi{font-size:20px;margin-bottom:4px}
+
+/* ── LOADER ── */
+.loader{display:flex;align-items:center;gap:10px;padding:16px;color:var(--muted);font-size:13px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .4s}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.empty-text{font-size:14px}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transition:.3s;transform:translateY(20px);opacity:0;pointer-events:none}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.ok{background:rgba(16,185,129,.9);color:#fff}
+#toast.err{background:rgba(239,68,68,.9);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">YT.AI</div>
+    <div class="auth-tagline">YouTube Transcript & AI Summary Platform</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchAuthTab('register')">Register</button>
+    </div>
+    <div id="login-form">
+      <div class="form-group"><label>Username or Email</label><input id="l-user" type="text" placeholder="your@email.com" autocomplete="username"></div>
+      <div class="form-group"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign In</button>
+      <div id="login-alert"></div>
+    </div>
+    <div id="register-form" style="display:none">
+      <div class="form-group"><label>Username</label><input id="r-user" type="text" placeholder="johndoe" autocomplete="username"></div>
+      <div class="form-group"><label>Email</label><input id="r-email" type="email" placeholder="john@example.com" autocomplete="email"></div>
+      <div class="form-group"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 characters" autocomplete="new-password"></div>
+      <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+      <div id="register-alert"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+  <nav>
+    <div class="nav-logo">YT.AI</div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="goTab('video')">🎬 Video</button>
+      <button class="nav-tab" onclick="goTab('channel')">📺 Channel</button>
+      <button class="nav-tab" onclick="goTab('history')">📜 History</button>
+      <button class="nav-tab" onclick="goTab('settings')">⚙️ Settings</button>
+    </div>
+    <div class="nav-right">
+      <span class="user-badge" id="username-badge">—</span>
+      <button class="btn-icon" title="Sign out" onclick="doLogout()">↪</button>
+    </div>
+  </nav>
+
+  <!-- VIDEO TAB -->
+  <div class="page active" id="tab-video">
+    <div class="page-title">Single Video</div>
+    <div class="page-sub">Paste a YouTube video URL to fetch transcript and generate AI summary</div>
+    <div class="card">
+      <div class="field">
+        <label>YouTube Video URL</label>
+        <input id="v-url" type="url" placeholder="https://youtube.com/watch?v=..." style="margin-bottom:10px">
+      </div>
+      <div class="input-row">
+        <div class="field">
+          <label>AI Provider</label>
+          <select id="v-provider">
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="checkbox-row"><input type="checkbox" id="v-skip-ai"><span>Transcript only (no AI)</span></label>
+          <button class="btn btn-primary btn-sm" onclick="processVideo()" style="width:120px">▶ Process</button>
+        </div>
+      </div>
+    </div>
+    <div id="v-loader" style="display:none" class="card">
+      <div class="loader"><div class="spinner"></div><span id="v-loader-text">Fetching transcript…</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="v-progress" style="width:0%"></div></div>
+    </div>
+    <div id="v-result" style="display:none"></div>
+  </div>
+
+  <!-- CHANNEL TAB -->
+  <div class="page" id="tab-channel">
+    <div class="page-title">Channel Scraper</div>
+    <div class="page-sub">Scrape all videos from a YouTube channel — get transcripts and optional AI summaries in one PDF</div>
+    <div class="card">
+      <div class="field">
+        <label>Channel URL</label>
+        <input id="c-url" type="url" placeholder="https://youtube.com/@channelname">
+      </div>
+      <div class="input-row" style="flex-wrap:wrap;gap:14px">
+        <div class="field" style="min-width:140px">
+          <label>AI Provider</label>
+          <select id="c-provider">
+            <option value="openai">OpenAI (GPT-4o)</option>
+            <option value="anthropic">Anthropic (Claude)</option>
+            <option value="gemini">Google Gemini</option>
+          </select>
+        </div>
+        <div class="field" style="min-width:180px">
+          <label>Max Videos: <span id="c-max-val">20</span></label>
+          <div class="range-row">
+            <input type="range" id="c-max" min="5" max="100" step="5" value="20" oninput="document.getElementById('c-max-val').textContent=this.value">
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;justify-content:flex-end">
+          <label class="checkbox-row"><input type="checkbox" id="c-summaries"><span>Generate AI Summaries</span></label>
+          <button class="btn btn-primary btn-sm" onclick="processChannel()" style="width:140px">🚀 Scrape Channel</button>
+        </div>
+      </div>
+    </div>
+    <div id="c-loader" style="display:none" class="card">
+      <div class="loader"><div class="spinner"></div><span id="c-loader-text">Fetching channel…</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="c-progress" style="width:30%"></div></div>
+    </div>
+    <div id="c-result" style="display:none"></div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="page" id="tab-history">
+    <div class="page-title">History</div>
+    <div class="page-sub">Your recent activity</div>
+    <div id="history-list"><div class="empty"><div class="empty-icon">📜</div><div class="empty-text">No history yet</div></div></div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="page" id="tab-settings">
+    <div class="page-title">Settings</div>
+    <div class="page-sub">Manage your API keys — stored securely on your local server</div>
+
+    <div class="card">
+      <div class="card-title">Add / Update API Key</div>
+      <div class="provider-grid" id="provider-grid">
+        <div class="provider-card selected" data-p="openai" onclick="selectProvider('openai')"><div class="pi">🤖</div>OpenAI</div>
+        <div class="provider-card" data-p="anthropic" onclick="selectProvider('anthropic')"><div class="pi">🧠</div>Anthropic</div>
+        <div class="provider-card" data-p="gemini" onclick="selectProvider('gemini')"><div class="pi">✨</div>Gemini</div>
+      </div>
+      <div class="input-row" style="flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:200px">
+          <label>API Key</label>
+          <input id="new-key" type="password" placeholder="sk-... or your API key">
+        </div>
+        <div class="field" style="min-width:140px">
+          <label>Label (optional)</label>
+          <input id="new-label" type="text" placeholder="My main key">
+        </div>
+        <div style="padding-bottom:0">
+          <button class="btn btn-primary btn-sm" onclick="saveKey()" style="margin-top:22px">Save Key</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Saved Keys</div>
+      <div id="keys-list"><div class="loader"><div class="spinner"></div>Loading…</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Provider Reference</div>
+      <div style="font-size:13px;color:var(--muted);line-height:1.8">
+        <p>• <strong style="color:var(--text)">OpenAI</strong> — platform.openai.com → API Keys</p>
+        <p>• <strong style="color:var(--text)">Anthropic</strong> — console.anthropic.com → API Keys</p>
+        <p>• <strong style="color:var(--text)">Google Gemini</strong> — aistudio.google.com → Get API Key</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────
+let state = { user: null, selectedProvider: "openai", videoData: null, channelData: null };
+
+// ── TOAST ──────────────────────────────────────────────────────────────────
+function toast(msg, type="ok") {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.className = "show " + type;
+  setTimeout(() => t.className = "", 3000);
+}
+
+// ── AUTH ───────────────────────────────────────────────────────────────────
+function switchAuthTab(tab) {
+  document.querySelectorAll(".tab-btn").forEach((b,i) => b.classList.toggle("active", (tab==="login"&&i===0)||(tab==="register"&&i===1)));
+  document.getElementById("login-form").style.display = tab==="login" ? "block" : "none";
+  document.getElementById("register-form").style.display = tab==="register" ? "block" : "none";
+}
+
+async function doLogin() {
+  const u = document.getElementById("l-user").value.trim();
+  const p = document.getElementById("l-pass").value;
+  const el = document.getElementById("login-alert");
+  el.innerHTML = "";
+  const r = await fetch("/api/login", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p}),credentials:"include"});
+  const d = await r.json();
+  if (d.error) { el.innerHTML = `<div class="alert alert-error">${d.error}</div>`; return; }
+  state.user = d.username;
+  showApp();
+}
+
+async function doRegister() {
+  const u = document.getElementById("r-user").value.trim();
+  const e = document.getElementById("r-email").value.trim();
+  const p = document.getElementById("r-pass").value;
+  const el = document.getElementById("register-alert");
+  el.innerHTML = "";
+  const r = await fetch("/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,email:e,password:p}),credentials:"include"});
+  const d = await r.json();
+  if (d.error) { el.innerHTML = `<div class="alert alert-error">${d.error}</div>`; return; }
+  state.user = d.username;
+  showApp();
+}
+
+async function doLogout() {
+  await fetch("/api/logout",{method:"POST",credentials:"include"});
+  state.user = null;
+  document.getElementById("auth-screen").style.display = "flex";
+  document.getElementById("main-app").classList.remove("visible");
+}
+
+function showApp() {
+  document.getElementById("auth-screen").style.display = "none";
+  document.getElementById("main-app").classList.add("visible");
+  document.getElementById("username-badge").textContent = state.user;
+  loadKeys();
+  loadHistory();
+}
+
+async function checkSession() {
+  const r = await fetch("/api/me",{credentials:"include"});
+  const d = await r.json();
+  if (d.authenticated) { state.user = d.username; showApp(); }
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+function goTab(tab) {
+  document.querySelectorAll(".nav-tab").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+  document.getElementById("tab-"+tab).classList.add("active");
+  if (tab==="history") loadHistory();
+  if (tab==="settings") loadKeys();
+}
+
+// ── VIDEO ──────────────────────────────────────────────────────────────────
+async function processVideo() {
+  const url = document.getElementById("v-url").value.trim();
+  const provider = document.getElementById("v-provider").value;
+  const skipAI = document.getElementById("v-skip-ai").checked;
+  if (!url) { toast("Enter a YouTube URL","err"); return; }
+
+  const loader = document.getElementById("v-loader");
+  const result = document.getElementById("v-result");
+  loader.style.display = "block";
+  result.style.display = "none";
+
+  setProgress("v", 10, "Fetching transcript…");
+  const r = await fetch("/api/process-video",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({url,provider,skip_ai:skipAI}),credentials:"include"});
+  const d = await r.json();
+  loader.style.display = "none";
+
+  if (d.error) { toast(d.error,"err"); return; }
+
+  state.videoData = d;
+  renderVideoResult(d);
+  result.style.display = "block";
+}
+
+function setProgress(prefix, pct, text) {
+  document.getElementById(prefix+"-progress").style.width = pct + "%";
+  document.getElementById(prefix+"-loader-text").textContent = text;
+}
+
+function renderVideoResult(d) {
+  const el = document.getElementById("v-result");
+  const vi = d.video_info || {};
+  const sec = d.sections || {};
+  let html = `<div class="result-section">
+    <div class="video-meta card">
+      <div class="title">${esc(vi.title||"Unknown")}</div>
+      <div class="channel">📺 ${esc(vi.channel||"")}</div>
+      ${vi.url ? `<a href="${vi.url}" target="_blank">🔗 Watch on YouTube</a>` : ""}
+    </div>
+    <div class="stat-row">
+      <div class="stat">Words: <span>${(d.word_count||0).toLocaleString()}</span></div>
+      <div class="stat">Language: <span>${(d.lang||"").toUpperCase()}</span></div>
+      <div class="stat">Type: <span>${d.is_generated ? "Auto-generated" : "Manual"}</span></div>
+    </div>`;
+
+  if (sec.summary) html += `<div class="section-block"><div class="section-label">📖 Summary</div><div class="section-text">${esc(sec.summary)}</div></div>`;
+  if (sec.takeaways?.length) {
+    html += `<div class="section-block takeaways"><div class="section-label">🔑 Key Takeaways</div>`;
+    sec.takeaways.slice(0,5).forEach((t,i) => {
+      html += `<div class="takeaway-item"><div class="takeaway-num">${i+1}</div><div>${esc(t)}</div></div>`;
+    });
+    html += "</div>";
+  }
+  if (sec.study_notes?.length) {
+    html += `<div class="section-block notes"><div class="section-label">📝 Study Notes</div>`;
+    sec.study_notes.forEach(n => { html += `<div class="note-item">${esc(n)}</div>`; });
+    html += "</div>";
+  }
+  if (d.ai_error) html += `<div class="alert alert-error">AI error: ${esc(d.ai_error)}</div>`;
+
+  // Transcript
+  html += `<div class="card" style="margin-top:14px"><div class="card-title">Transcript</div>
+    <textarea readonly style="max-height:220px">${esc(d.transcript||"")}</textarea></div>`;
+
+  // Downloads
+  html += `<div class="download-row">`;
+  html += `<button class="dl-btn" onclick="dlTxt()">📄 Transcript (.txt)</button>`;
+  if (sec.summary) html += `<button class="dl-btn" onclick="dlPDF()">📑 AI Summary (.pdf)</button>`;
+  html += `</div></div>`;
+  el.innerHTML = html;
+}
+
+function dlTxt() {
+  if (!state.videoData) return;
+  const blob = new Blob([state.videoData.transcript||""], {type:"text/plain"});
+  dlBlob(blob, `transcript_${state.videoData.video_id}.txt`);
+}
+
+async function dlPDF() {
+  if (!state.videoData) return;
+  const r = await fetch("/api/download-pdf",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(state.videoData),credentials:"include"});
+  if (!r.ok) { toast("PDF generation failed","err"); return; }
+  const blob = await r.blob();
+  dlBlob(blob, `summary_${state.videoData.video_id}.pdf`);
+}
+
+// ── CHANNEL ────────────────────────────────────────────────────────────────
+async function processChannel() {
+  const url = document.getElementById("c-url").value.trim();
+  const provider = document.getElementById("c-provider").value;
+  const maxV = parseInt(document.getElementById("c-max").value);
+  const genS = document.getElementById("c-summaries").checked;
+  if (!url) { toast("Enter a channel URL","err"); return; }
+
+  const loader = document.getElementById("c-loader");
+  const result = document.getElementById("c-result");
+  loader.style.display = "block"; result.style.display = "none";
+  setProgress("c", 20, "Fetching channel videos…");
+
+  const r = await fetch("/api/process-channel",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({url,provider,max_videos:maxV,gen_summaries:genS}),credentials:"include"});
+  const d = await r.json();
+  loader.style.display = "none";
+
+  if (d.error) { toast(d.error,"err"); return; }
+  state.channelData = d;
+  renderChannelResult(d);
+  result.style.display = "block";
+}
+
+function renderChannelResult(d) {
+  const el = document.getElementById("c-result");
+  const vids = d.videos || [];
+  const withT = vids.filter(v=>v.has_transcript).length;
+  const withS = vids.filter(v=>v.ai_summary).length;
+
+  let html = `<div class="result-section"><div class="card">
+    <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:6px">${esc(d.channel_name)}</div>
+    <div class="stat-row">
+      <div class="stat">Videos: <span>${vids.length}</span></div>
+      <div class="stat">With transcript: <span>${withT}</span></div>
+      ${withS ? `<div class="stat">AI summaries: <span>${withS}</span></div>` : ""}
+    </div>
+    <div class="download-row"><button class="dl-btn" onclick="dlChannelPDF()">📑 Download Full PDF Report</button></div>
+  </div>`;
+
+  vids.slice(0,30).forEach((v,i) => {
+    const hasTbadge = v.has_transcript ? `<span class="badge badge-ok">✓ Transcript</span>` : `<span class="badge badge-no">No transcript</span>`;
+    const hasSbadge = v.ai_summary ? `<span class="badge badge-ai">✦ AI Summary</span>` : "";
+    html += `<div class="video-card">
+      <div class="vc-title">${i+1}. ${esc(v.title||"Untitled")}</div>
+      <div class="vc-meta">${hasTbadge}${hasSbadge}${v.url?`<a href="${v.url}" target="_blank" style="color:var(--accent);text-decoration:none">Watch ↗</a>`:""}
+      </div>
+      ${v.ai_summary ? `<div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5">${esc(v.ai_summary.slice(0,200))}…</div>` : ""}
+    </div>`;
+  });
+  if (vids.length > 30) html += `<div style="text-align:center;color:var(--muted);font-size:13px;padding:10px">…and ${vids.length-30} more in the PDF</div>`;
+  html += "</div>";
+  el.innerHTML = html;
+}
+
+async function dlChannelPDF() {
+  if (!state.channelData) return;
+  toast("Generating PDF…","ok");
+  const r = await fetch("/api/download-channel-pdf",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(state.channelData),credentials:"include"});
+  if (!r.ok) { toast("PDF failed","err"); return; }
+  const blob = await r.blob();
+  const name = (state.channelData.channel_name||"channel").replace(/[^\w\s-]/g,"").replace(/\s/g,"_");
+  dlBlob(blob, `${name}_report.pdf`);
+}
+
+// ── HISTORY ────────────────────────────────────────────────────────────────
+async function loadHistory() {
+  const r = await fetch("/api/history",{credentials:"include"});
+  if (!r.ok) return;
+  const items = await r.json();
+  const el = document.getElementById("history-list");
+  if (!items.length) { el.innerHTML = `<div class="empty"><div class="empty-icon">📜</div><div class="empty-text">No history yet</div></div>`; return; }
+  el.innerHTML = items.map(h => `
+    <div class="history-item">
+      <div class="history-icon ${h.type}">${h.type==="video"?"🎬":"📺"}</div>
+      <div class="history-info">
+        <div class="ht">${esc(h.title||"Unknown")}</div>
+        <div class="hd">${h.type==="video"?"Video":"Channel"} · ${new Date(h.created_at).toLocaleString()}</div>
+      </div>
+      ${h.url ? `<a href="${h.url}" target="_blank" style="color:var(--accent);font-size:12px;text-decoration:none">↗</a>` : ""}
+    </div>`).join("");
+}
+
+// ── SETTINGS ───────────────────────────────────────────────────────────────
+function selectProvider(p) {
+  state.selectedProvider = p;
+  document.querySelectorAll(".provider-card").forEach(c => c.classList.toggle("selected", c.dataset.p===p));
+}
+
+async function loadKeys() {
+  const el = document.getElementById("keys-list");
+  const r = await fetch("/api/keys",{credentials:"include"});
+  const keys = await r.json();
+  if (!keys.length) { el.innerHTML = `<div style="color:var(--muted);font-size:13px">No API keys saved yet.</div>`; return; }
+  el.innerHTML = keys.map(k => `
+    <div class="key-item">
+      <div class="key-provider">${providerLabel(k.provider)}</div>
+      <div class="key-masked">${k.masked}</div>
+      <div class="key-date">${new Date(k.created_at).toLocaleDateString()}</div>
+      <button class="btn btn-danger btn-sm" onclick="deleteKey(${k.id})">Delete</button>
+    </div>`).join("");
+}
+
+function providerLabel(p) {
+  return {openai:"🤖 OpenAI",anthropic:"🧠 Anthropic",gemini:"✨ Gemini"}[p] || p;
+}
+
+async function saveKey() {
+  const key = document.getElementById("new-key").value.trim();
+  const label = document.getElementById("new-label").value.trim();
+  if (!key) { toast("Enter an API key","err"); return; }
+  const r = await fetch("/api/keys",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({provider:state.selectedProvider,key_value:key,label}),credentials:"include"});
+  const d = await r.json();
+  if (d.error) { toast(d.error,"err"); return; }
+  document.getElementById("new-key").value = "";
+  document.getElementById("new-label").value = "";
+  toast("Key saved","ok");
+  loadKeys();
+}
+
+async function deleteKey(id) {
+  if (!confirm("Delete this key?")) return;
+  await fetch(`/api/keys/${id}`,{method:"DELETE",credentials:"include"});
+  toast("Key deleted","ok");
+  loadKeys();
+}
+
+// ── UTILS ──────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function dlBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// ── ENTER KEY ─────────────────────────────────────────────────────────────
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    if (document.getElementById("l-user") === document.activeElement || document.getElementById("l-pass") === document.activeElement) doLogin();
+    if (document.getElementById("r-user") === document.activeElement || document.getElementById("r-email") === document.activeElement || document.getElementById("r-pass") === document.activeElement) doRegister();
+  }
+});
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+checkSession();
+</script>
+</body>
+</html>
