@@ -39,44 +39,35 @@ Then open **http://localhost:5000** in your browser.
 
 ---
 
-## Deploy to Vercel
+## Deploy to Render (Recommended)
 
 ### Quick Deploy
 
 1. Push this repo to GitHub
-2. Go to [vercel.com](https://vercel.com) → **Add New Project**
-3. Import your GitHub repo
-4. Set environment variables in Vercel dashboard:
-   - `SECRET_KEY` — run `python -c "import secrets; print(secrets.token_hex(32))"`
-   - `FLASK_ENV` = `production`
-5. Click **Deploy** — done!
+2. Go to [render.com](https://render.com) → **New** → **Blueprint**
+3. Connect your GitHub repo — Render auto-detects `render.yaml`
+4. Click **Apply** — done! `SECRET_KEY` is auto-generated
 
-Vercel auto-detects `vercel.json` and routes everything through the Flask serverless function.
+That's it. Render will install dependencies, start gunicorn, and give you a public URL.
 
-### ⚠️ Vercel Limitations
+### What You Get on Free Tier
 
-| Limitation | Detail | Impact |
-|---|---|---|
-| **Ephemeral filesystem** | SQLite DB is stored in `/tmp` — resets on cold starts | User accounts/keys/history may be lost between deployments or after inactivity |
-| **Function timeout** | Free tier: 10s, Pro tier: 60s | AI summary + transcript fetch can take 15-30s — **Pro plan recommended** |
-| **No persistent storage** | Vercel has no built-in disk persistence | For production use, consider migrating to a hosted DB (Turso, Supabase, etc.) |
-
-> **For personal use / demos**, the ephemeral DB is fine — just re-register when needed.  
-> **For production**, pair with a hosted SQLite service like [Turso](https://turso.tech) or switch to Postgres.
+- ✅ No request timeout — AI calls can take as long as needed
+- ✅ SQLite works — data persists while the instance is running
+- ✅ Auto-deploy on every `git push`
+- ⚠️ Instance sleeps after 15 min of inactivity (~30s cold start)
+- ⚠️ DB resets on redeploy (re-register + re-add API keys)
 
 ### Alternative: Self-Host / VPS
 
 ```bash
-# Clone and install
 git clone <your-repo-url> && cd Youtube_Transcript_AI
 pip install -r requirements.txt
 
-# Set environment
 export SECRET_KEY=$(python -c "import secrets; print(secrets.token_hex(32))")
 export FLASK_ENV=production
 export PORT=8000
 
-# Run with gunicorn
 gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
 ```
 
@@ -85,10 +76,10 @@ gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `SECRET_KEY` | **Yes** (prod) | Random | Session encryption key — must persist |
-| `PORT` | No | `5000` | Server port (local dev / VPS only) |
+| `PORT` | No | `5000` | Server port |
 | `FLASK_ENV` | No | `development` | Set to `production` for secure cookies |
 | `FLASK_DEBUG` | No | `0` | Set to `1` for debug mode (dev only) |
-| `DB_PATH` | No | `ytai_data.db` | SQLite database path (ignored on Vercel) |
+| `DB_PATH` | No | `ytai_data.db` | SQLite database file path |
 
 ---
 
@@ -98,8 +89,6 @@ All data lives in `ytai_data.db` (same folder as `app.py`).
 **Never delete this file** — it contains all user accounts, API keys, and history.
 
 To back up: copy `ytai_data.db` anywhere.
-
-> On Vercel, the DB lives in `/tmp/ytai_data.db` and is ephemeral.
 
 ---
 
@@ -117,12 +106,10 @@ To back up: copy `ytai_data.db` anywhere.
 
 ```
 Youtube_Transcript_AI/
-├── api/
-│   └── index.py        # Vercel serverless entry point
 ├── app.py              # Flask application (all routes + logic)
-├── vercel.json         # Vercel deployment configuration
 ├── requirements.txt    # Python dependencies
-├── Procfile            # WSGI entry point (VPS / Railway)
+├── Procfile            # WSGI entry point for gunicorn
+├── render.yaml         # Render.com auto-deploy blueprint
 ├── runtime.txt         # Python version specification
 ├── .env.example        # Environment variable reference
 ├── .gitignore          # Files excluded from git
