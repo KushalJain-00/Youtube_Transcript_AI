@@ -8,21 +8,51 @@
 <style>
 :root {
   --bg: #06080f;
-  --surface: #0d1117;
-  --surface2: #161b27;
-  --border: #1e2533;
+  --surface: rgba(13, 17, 23, 0.6);
+  --surface2: rgba(22, 27, 39, 0.6);
+  --border: rgba(30, 37, 51, 0.6);
   --accent: #3b82f6;
   --accent2: #8b5cf6;
   --accent3: #06b6d4;
   --text: #e2e8f0;
-  --muted: #64748b;
+  --muted: #94a3b8;
   --success: #10b981;
   --danger: #ef4444;
   --warn: #f59e0b;
-  --radius: 12px;
+  --radius: 16px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;position:relative}
+
+.ambient-orb{position:fixed;border-radius:50%;filter:blur(120px);z-index:-1;animation:floatOrb 20s infinite ease-in-out alternate;pointer-events:none}
+.orb-1{width:400px;height:400px;background:rgba(59,130,246,0.3);top:-100px;left:-100px}
+.orb-2{width:500px;height:500px;background:rgba(139,92,246,0.25);bottom:-150px;right:-100px;animation-delay:-5s}
+.orb-3{width:300px;height:300px;background:rgba(6,182,212,0.2);top:40%;left:40%;animation-delay:-10s}
+@keyframes floatOrb{0%{transform:translate(0,0) scale(1)}100%{transform:translate(50px,100px) scale(1.1)}}
+
+.card, .auth-card, nav, .video-meta, .section-block, .video-card, .history-item, .key-item, select, textarea, input, .provider-card, .tab-row, .transcript-box {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.btn:active, .btn-icon:active, .nav-tab:active, .dl-btn:active, .provider-card:active {
+  transform: scale(0.97);
+}
+.card, .auth-card, .video-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.card:hover, .video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.5);
+}
+.btn-primary {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+  transform: translateY(-2px);
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -85,6 +115,8 @@ select{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid 
 select:focus{border-color:var(--accent)}
 textarea{width:100%;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',monospace;font-size:12px;outline:none;resize:vertical;min-height:180px;line-height:1.6}
 textarea:focus{border-color:var(--accent)}
+.transcript-box{width:100%;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.8;max-height:300px;overflow-y:auto;box-shadow:inset 0 4px 20px rgba(0,0,0,0.2);transition:border-color .3s ease,box-shadow .3s ease}
+.transcript-box:hover{border-color:rgba(139,92,246,0.5);box-shadow:inset 0 4px 20px rgba(0,0,0,0.2),0 0 15px rgba(139,92,246,0.2)}
 .checkbox-row{display:flex;align-items:center;gap:8px;cursor:pointer}
 .checkbox-row input[type=checkbox]{width:auto;accent-color:var(--accent)}
 .checkbox-row span{font-size:13px;color:var(--muted)}
@@ -106,11 +138,21 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 .section-block{background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:12px;border-left:3px solid var(--accent)}
 .section-block.takeaways{border-left-color:var(--accent2)}
 .section-block.notes{border-left-color:var(--accent3)}
-.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.section-label{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
 .section-text{font-size:13px;line-height:1.7;color:var(--text)}
-.takeaway-item{display:flex;gap:8px;margin-bottom:7px;font-size:13px}
+.takeaway-item{display:flex;gap:8px;margin-bottom:7px;font-size:13px;animation:fadeUp .5s ease backwards}
+.takeaway-item:nth-child(1){animation-delay:.1s}
+.takeaway-item:nth-child(2){animation-delay:.2s}
+.takeaway-item:nth-child(3){animation-delay:.3s}
+.takeaway-item:nth-child(4){animation-delay:.4s}
+.takeaway-item:nth-child(5){animation-delay:.5s}
 .takeaway-num{width:20px;height:20px;border-radius:50%;background:var(--accent2);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
-.note-item{padding:5px 0;font-size:13px;color:var(--text);border-bottom:1px solid var(--border)}
+.note-item{padding:5px 0;font-size:13px;color:var(--text);border-bottom:1px solid var(--border);animation:fadeUp .5s ease backwards}
+.note-item:nth-child(1){animation-delay:.1s}
+.note-item:nth-child(2){animation-delay:.2s}
+.note-item:nth-child(3){animation-delay:.3s}
+.note-item:nth-child(4){animation-delay:.4s}
+.note-item:nth-child(5){animation-delay:.5s}
 .note-item:last-child{border:none}
 .note-item::before{content:"·  ";color:var(--accent3);font-size:16px}
 .download-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
@@ -138,10 +180,10 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 
 /* ── SETTINGS ── */
 .key-item{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface2);border-radius:10px;margin-bottom:8px}
-.key-provider{font-size:13px;font-weight:600;width:90px}
+.key-provider{font-size:13px;font-weight:600;width:120px}
 .key-masked{font-family:monospace;font-size:12px;color:var(--muted);flex:1}
 .key-date{font-size:11px;color:var(--muted);margin-right:4px}
-.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:14px}
+.provider-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:8px;margin-bottom:14px}
 .provider-card{padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--surface2);cursor:pointer;text-align:center;transition:.2s;font-size:12px;color:var(--muted)}
 .provider-card:hover,.provider-card.selected{border-color:var(--accent);color:var(--accent);background:rgba(59,130,246,.07)}
 .provider-card .pi{font-size:20px;margin-bottom:4px}
@@ -163,9 +205,56 @@ input[type=range]{flex:1;accent-color:var(--accent)}
 #toast.show{transform:translateY(0);opacity:1}
 #toast.ok{background:rgba(16,185,129,.9);color:#fff}
 #toast.err{background:rgba(239,68,68,.9);color:#fff}
+
+@media (max-width: 768px) {
+  nav {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    justify-content: space-around;
+    padding: 10px;
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    z-index: 1000;
+  }
+  .nav-logo, .user-badge {
+    display: none;
+  }
+  .nav-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .nav-tab {
+    flex-direction: column;
+    font-size: 11px;
+    padding: 6px;
+    gap: 4px;
+  }
+  #main-app {
+    padding-bottom: 70px;
+  }
+  .input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .input-row .field, .btn-sm {
+    width: 100% !important;
+  }
+  input, select, textarea, .btn {
+    width: 100% !important;
+  }
+  .nav-right {
+    margin-left: 0;
+  }
+}
 </style>
 </head>
 <body>
+
+<div class="ambient-orb orb-1"></div>
+<div class="ambient-orb orb-2"></div>
+<div class="ambient-orb orb-3"></div>
 
 <!-- AUTH -->
 <div id="auth-screen">
@@ -218,14 +307,6 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <input id="v-url" type="url" placeholder="https://youtube.com/watch?v=..." style="margin-bottom:10px">
       </div>
       <div class="input-row">
-        <div class="field">
-          <label>AI Provider</label>
-          <select id="v-provider">
-            <option value="openai">OpenAI (GPT-4o)</option>
-            <option value="anthropic">Anthropic (Claude)</option>
-            <option value="gemini">Google Gemini</option>
-          </select>
-        </div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <label class="checkbox-row"><input type="checkbox" id="v-skip-ai"><span>Transcript only (no AI)</span></label>
           <button class="btn btn-primary btn-sm" onclick="processVideo()" style="width:120px">▶ Process</button>
@@ -249,14 +330,6 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <input id="c-url" type="url" placeholder="https://youtube.com/@channelname">
       </div>
       <div class="input-row" style="flex-wrap:wrap;gap:14px">
-        <div class="field" style="min-width:140px">
-          <label>AI Provider</label>
-          <select id="c-provider">
-            <option value="openai">OpenAI (GPT-4o)</option>
-            <option value="anthropic">Anthropic (Claude)</option>
-            <option value="gemini">Google Gemini</option>
-          </select>
-        </div>
         <div class="field" style="min-width:180px">
           <label>Max Videos: <span id="c-max-val">20</span></label>
           <div class="range-row">
@@ -294,8 +367,12 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <div class="provider-card selected" data-p="openai" onclick="selectProvider('openai')"><div class="pi">🤖</div>OpenAI</div>
         <div class="provider-card" data-p="anthropic" onclick="selectProvider('anthropic')"><div class="pi">🧠</div>Anthropic</div>
         <div class="provider-card" data-p="gemini" onclick="selectProvider('gemini')"><div class="pi">✨</div>Gemini</div>
+        <div class="provider-card" data-p="openrouter" onclick="selectProvider('openrouter')"><div class="pi">🌐</div>OpenRouter</div>
+        <div class="provider-card" data-p="groq" onclick="selectProvider('groq')"><div class="pi">⚡</div>Groq</div>
+        <div class="provider-card" data-p="deepseek" onclick="selectProvider('deepseek')"><div class="pi">🔮</div>DeepSeek</div>
+        <div class="provider-card" data-p="ollama" onclick="selectProvider('ollama')"><div class="pi">🏠</div>Ollama</div>
       </div>
-      <div class="input-row" style="flex-wrap:wrap">
+      <div class="input-row" style="flex-wrap:wrap; margin-bottom:14px">
         <div class="field" style="flex:1;min-width:200px">
           <label>API Key</label>
           <input id="new-key" type="password" placeholder="sk-... or your API key">
@@ -303,6 +380,18 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <div class="field" style="min-width:140px">
           <label>Label (optional)</label>
           <input id="new-label" type="text" placeholder="My main key">
+        </div>
+      </div>
+      <div class="input-row" style="flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:200px">
+          <label>Model</label>
+          <select id="new-model" onchange="checkCustomModel()">
+            <option value="">Loading models...</option>
+          </select>
+        </div>
+        <div class="field" id="custom-model-field" style="display:none;flex:1;min-width:200px">
+          <label>Custom Model ID</label>
+          <input id="custom-model" type="text" placeholder="e.g. meta-llama/llama-3">
         </div>
         <div style="padding-bottom:0">
           <button class="btn btn-primary btn-sm" onclick="saveKey()" style="margin-top:22px">Save Key</button>
@@ -321,6 +410,10 @@ input[type=range]{flex:1;accent-color:var(--accent)}
         <p>• <strong style="color:var(--text)">OpenAI</strong> — platform.openai.com → API Keys</p>
         <p>• <strong style="color:var(--text)">Anthropic</strong> — console.anthropic.com → API Keys</p>
         <p>• <strong style="color:var(--text)">Google Gemini</strong> — aistudio.google.com → Get API Key</p>
+        <p>• <strong style="color:var(--text)">OpenRouter</strong> — openrouter.ai/keys → Create Key (access 200+ models)</p>
+        <p>• <strong style="color:var(--text)">Groq</strong> — console.groq.com → API Keys (ultra-fast inference)</p>
+        <p>• <strong style="color:var(--text)">DeepSeek</strong> — platform.deepseek.com → API Keys</p>
+        <p>• <strong style="color:var(--text)">Ollama</strong> — No key needed! Run locally at localhost:11434. <a href="https://ollama.com" target="_blank" style="color:var(--accent)">Install Ollama →</a></p>
       </div>
     </div>
   </div>
@@ -405,7 +498,7 @@ function goTab(tab) {
 // ── VIDEO ──────────────────────────────────────────────────────────────────
 async function processVideo() {
   const url = document.getElementById("v-url").value.trim();
-  const provider = document.getElementById("v-provider").value;
+  const provider = state.selectedProvider;
   const skipAI = document.getElementById("v-skip-ai").checked;
   if (!url) { toast("Enter a YouTube URL","err"); return; }
 
@@ -465,7 +558,7 @@ function renderVideoResult(d) {
 
   // Transcript
   html += `<div class="card" style="margin-top:14px"><div class="card-title">Transcript</div>
-    <textarea readonly style="max-height:220px">${esc(d.transcript||"")}</textarea></div>`;
+    <div class="transcript-box">${esc(d.transcript||"").replace(/\n/g,"<br>")}</div></div>`;
 
   // Downloads
   html += `<div class="download-row">`;
@@ -493,7 +586,7 @@ async function dlPDF() {
 // ── CHANNEL ────────────────────────────────────────────────────────────────
 async function processChannel() {
   const url = document.getElementById("c-url").value.trim();
-  const provider = document.getElementById("c-provider").value;
+  const provider = state.selectedProvider;
   const maxV = parseInt(document.getElementById("c-max").value);
   const genS = document.getElementById("c-summaries").checked;
   if (!url) { toast("Enter a channel URL","err"); return; }
@@ -501,17 +594,77 @@ async function processChannel() {
   const loader = document.getElementById("c-loader");
   const result = document.getElementById("c-result");
   loader.style.display = "block"; result.style.display = "none";
-  setProgress("c", 20, "Fetching channel videos…");
+  setProgress("c", 5, "Connecting...");
 
-  const r = await fetch("/api/process-channel",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({url,provider,max_videos:maxV,gen_summaries:genS}),credentials:"include"});
-  const d = await r.json();
-  loader.style.display = "none";
+  try {
+    const r = await fetch("/api/process-channel",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({url,provider,max_videos:maxV,gen_summaries:genS}),
+      credentials:"include"
+    });
+    
+    if (!r.ok) {
+      let errTxt = await r.text();
+      try { errTxt = JSON.parse(errTxt).error || errTxt; } catch(e){}
+      toast(errTxt,"err");
+      loader.style.display = "none";
+      return;
+    }
 
-  if (d.error) { toast(d.error,"err"); return; }
-  state.channelData = d;
-  renderChannelResult(d);
-  result.style.display = "block";
+    const reader = r.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop();
+      
+      for (const part of parts) {
+        if (part.startsWith("data: ")) {
+          const jsonStr = part.slice(6);
+          try {
+            const d = JSON.parse(jsonStr);
+            if (d.error) {
+              toast(d.error,"err");
+              loader.style.display = "none";
+              return;
+            }
+            if (d.progress !== undefined) {
+              setProgress("c", d.progress, d.text || "");
+            }
+            if (d.progress === 100 || (d.videos && d.channel_name)) {
+              loader.style.display = "none";
+              state.channelData = d;
+              renderChannelResult(d);
+              result.style.display = "block";
+              return;
+            }
+          } catch (e) {
+            console.error("Parse error:", e);
+          }
+        }
+      }
+    }
+    // Handle remaining buffer if any complete chunk is left
+    if (buffer.startsWith("data: ")) {
+      try {
+        const d = JSON.parse(buffer.slice(6));
+        if (d.progress === 100 || (d.videos && d.channel_name)) {
+          loader.style.display = "none";
+          state.channelData = d;
+          renderChannelResult(d);
+          result.style.display = "block";
+        }
+      } catch (e) {}
+    }
+  } catch (err) {
+    loader.style.display = "none";
+    toast("Request failed","err");
+  }
 }
 
 function renderChannelResult(d) {
@@ -578,6 +731,39 @@ async function loadHistory() {
 function selectProvider(p) {
   state.selectedProvider = p;
   document.querySelectorAll(".provider-card").forEach(c => c.classList.toggle("selected", c.dataset.p===p));
+  loadModels(p);
+  const keyInput = document.getElementById("new-key");
+  if (p === "ollama") {
+    keyInput.value = "ollama";
+    keyInput.disabled = true;
+  } else {
+    if (keyInput.value === "ollama") keyInput.value = "";
+    keyInput.disabled = false;
+  }
+}
+
+async function loadModels(p) {
+  const sel = document.getElementById("new-model");
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Loading...</option>';
+  try {
+    const r = await fetch(`/api/models/${p}`);
+    const models = await r.json();
+    let html = '';
+    models.forEach(m => { html += `<option value="${m}">${m}</option>`; });
+    html += '<option value="custom">-- Custom Model --</option>';
+    sel.innerHTML = html;
+    checkCustomModel();
+  } catch(e) {
+    sel.innerHTML = '<option value="custom">-- Custom Model --</option>';
+    checkCustomModel();
+  }
+}
+
+function checkCustomModel() {
+  const sel = document.getElementById("new-model");
+  const cust = document.getElementById("custom-model-field");
+  if (cust) cust.style.display = sel.value === "custom" ? "block" : "none";
 }
 
 async function loadKeys() {
@@ -589,25 +775,33 @@ async function loadKeys() {
     <div class="key-item">
       <div class="key-provider">${providerLabel(k.provider)}</div>
       <div class="key-masked">${k.masked}</div>
-      <div class="key-date">${new Date(k.created_at).toLocaleDateString()}</div>
+      <div class="key-date" style="margin-left:auto;margin-right:10px">${k.model || "Default"}</div>
       <button class="btn btn-danger btn-sm" onclick="deleteKey(${k.id})">Delete</button>
     </div>`).join("");
 }
 
 function providerLabel(p) {
-  return {openai:"🤖 OpenAI",anthropic:"🧠 Anthropic",gemini:"✨ Gemini"}[p] || p;
+  return {openai:"🤖 OpenAI",anthropic:"🧠 Anthropic",gemini:"✨ Gemini",openrouter:"🌐 OpenRouter",groq:"⚡ Groq",deepseek:"🔮 DeepSeek",ollama:"🏠 Ollama"}[p] || p;
 }
 
 async function saveKey() {
-  const key = document.getElementById("new-key").value.trim();
+  let key = document.getElementById("new-key").value.trim();
+  if (state.selectedProvider === "ollama") key = "ollama";
   const label = document.getElementById("new-label").value.trim();
+  const selModel = document.getElementById("new-model").value;
+  const custModel = document.getElementById("custom-model").value.trim();
+  const model = selModel === "custom" ? custModel : selModel;
+  
   if (!key) { toast("Enter an API key","err"); return; }
+  if (selModel === "custom" && !model) { toast("Enter a custom model ID","err"); return; }
+  
   const r = await fetch("/api/keys",{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({provider:state.selectedProvider,key_value:key,label}),credentials:"include"});
+    body:JSON.stringify({provider:state.selectedProvider,key_value:key,label,model}),credentials:"include"});
   const d = await r.json();
   if (d.error) { toast(d.error,"err"); return; }
-  document.getElementById("new-key").value = "";
+  document.getElementById("new-key").value = state.selectedProvider === "ollama" ? "ollama" : "";
   document.getElementById("new-label").value = "";
+  if (document.getElementById("custom-model")) document.getElementById("custom-model").value = "";
   toast("Key saved","ok");
   loadKeys();
 }

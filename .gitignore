@@ -30,3 +30,7 @@ ytai_data.db
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Secrets
+.secret_key
+.fernet_key
